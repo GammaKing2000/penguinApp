@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State var activity: String = ""
     var body: some View {
         VStack (alignment: .leading) {
             Text("Choose your calendars")
@@ -15,7 +16,8 @@ struct ContentView: View {
                 .fontWeight(.bold)
             Text("Please choose your calendar so we can help manage your schedule and  provide suggestions.")
                 .font(.body)
-            
+            TextField("Type more activities...", text: $activity)
+            Text("yay")
         }
         .frame(width: 330)
 //        .padding(EdgeInsets(top: -300, leading: -20, bottom: 0, trailing: 0))
