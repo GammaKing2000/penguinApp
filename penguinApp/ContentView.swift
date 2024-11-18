@@ -15,6 +15,9 @@ struct ContentView: View {
                 .fontWeight(.bold)
             Text("Please choose your calendar so we can help manage your schedule and  provide suggestions.")
                 .font(.body)
+            Text("\n########")
+            Text("Trying to make Chat Menu.")
+            Text("########")
             
         }
         .frame(width: 330)
