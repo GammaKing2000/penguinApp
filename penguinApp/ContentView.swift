@@ -16,7 +16,6 @@ struct ContentView: View {
                 .fontWeight(.bold)
             Text("Please choose your calendar so we can help manage your schedule and  provide suggestions.")
                 .font(.body)
-            TextField("Type more activities...", text: $activity)
         }
         .frame(width: 330)
 //        .padding(EdgeInsets(top: -300, leading: -20, bottom: 0, trailing: 0))
