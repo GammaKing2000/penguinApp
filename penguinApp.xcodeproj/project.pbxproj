@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		5C526AD22CEAD79E00991329 /* penguinApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = penguinApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5C526AD22CEAD79E00991329 /* penguinApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = penguinApp.app; path = /Users/karmsfung/Documents/penguinApp/build/Debug/penguinApp.app; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -33,16 +33,7 @@
 			isa = PBXGroup;
 			children = (
 				5C526AD42CEAD79E00991329 /* penguinApp */,
-				5C526AD32CEAD79E00991329 /* Products */,
 			);
-			sourceTree = "<group>";
-		};
-		5C526AD32CEAD79E00991329 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				5C526AD22CEAD79E00991329 /* penguinApp.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -95,7 +86,7 @@
 			mainGroup = 5C526AC92CEAD79E00991329;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 5C526AD32CEAD79E00991329 /* Products */;
+			productRefGroup = 5C526AC92CEAD79E00991329;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -248,7 +239,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"penguinApp/Preview Content\"";
-				DEVELOPMENT_TEAM = 9J9ZX9H8QG;
+				DEVELOPMENT_TEAM = P4G542Y5T6;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -287,7 +278,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"penguinApp/Preview Content\"";
-				DEVELOPMENT_TEAM = 9J9ZX9H8QG;
+				DEVELOPMENT_TEAM = P4G542Y5T6;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
