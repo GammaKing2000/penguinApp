@@ -4,7 +4,6 @@
 //
 //  Created by River on 18/11/2024.
 //
-
 import SwiftUI
 
 struct ActivityPageView: View {
@@ -14,51 +13,12 @@ struct ActivityPageView: View {
         startPoint: .top, endPoint: .bottom)
     @State var showChooseActivity = false
     var body: some View {
-        return Group {
             if showChooseActivity {
                 ChooseActivityView(backgroundGradient: $backgroundGradient)
             }
             else {
-                ChooseCalendarView(showChooseActivity: $showChooseActivity, backgroundGradient: $backgroundGradient)
+                ChooseCalendarView(backgroundGradient: backgroundGradient, showChooseActivity: $showChooseActivity)
             }
-        }
-    }
-}
-
-
-struct ChooseCalendarView: View {
-    @Binding var showChooseActivity: Bool
-    @Binding var backgroundGradient: LinearGradient
-    var body: some View {
-        ZStack {
-            backgroundGradient
-            VStack {
-                VStack (alignment: .leading) {
-                    Text("Choose your calendars")
-                        .font(.title)
-                        .fontWeight(.bold)
-                    Text("Please choose your calendar so we can   help manage your schedule and  provide suggestions.")
-                        .font(.body)
-                }
-                .frame(width: 340, height: 120)
-                VStack (alignment: .center) {
-                    Button("Later") {
-                        showChooseActivity.toggle()
-                    }
-                        .foregroundStyle(.gray)
-                        .fontWeight(.semibold)
-                    Button("Continue                                               ") {
-                        showChooseActivity.toggle()
-                    }
-                        .buttonStyle(.borderedProminent)
-                        .buttonBorderShape(.capsule)
-                        .tint(Color(red: 0.42745098039215684, green: 0.38823529411764707, blue: 0.8862745098039215))
-                        .controlSize(.extraLarge)
-                        .fontWeight(.semibold)
-                }
-                .frame(width: 340, height: 100)
-            }
-        }.ignoresSafeArea()
     }
 }
 
@@ -71,6 +31,10 @@ struct ChooseActivityView: View {
         Image(.activity9Book)
     ]
     @State var activity = ""
+//    @State var backgroundGradient = LinearGradient(
+//        // colors: [Color.white, Color(red: 179, green: 193, blue: 221)],
+//        colors: [Color.white, Color(red: 179 / 256, green: 193 / 256, blue: 221 / 256)],
+//        startPoint: .top, endPoint: .bottom)
     @Binding var backgroundGradient: LinearGradient
     var body: some View {
         ZStack {
@@ -126,5 +90,8 @@ struct ChooseActivityView: View {
 }
 
 #Preview {
-    ActivityPageView()
+    ChooseActivityView(backgroundGradient: .constant(LinearGradient(
+        colors: [Color.white, Color(red: 179 / 256, green: 193 / 256, blue: 221 / 256)],
+        startPoint: .top, endPoint: .bottom
+    )))
 }
