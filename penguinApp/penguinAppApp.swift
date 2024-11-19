@@ -11,7 +11,8 @@ import SwiftUI
 struct penguinAppApp: App {
     var body: some Scene {
         WindowGroup {
-            WelcomeView(onContinue: {} )
+            WelcomeView()
         }
     }
 }
+
