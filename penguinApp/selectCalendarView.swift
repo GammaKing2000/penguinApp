@@ -8,6 +8,12 @@
 import SwiftUI
 
 struct ChooseCalendarView: View {
+    let calendars: [Calendar] = [
+        Calendar(id: "google", image: Image(.calendarGoogle), name: "Google Calendar"),
+        Calendar(id: "outlook", image: Image(.calendarOutlook), name: "Outlook Calendar"),
+    ]
+    @State var selectedCalendarIndex = -1
+    @State var isShowingConfirmation = false
     var body: some View {
         NavigationStack {
             ZStack {
@@ -22,6 +28,21 @@ struct ChooseCalendarView: View {
                             .font(.body)
                     }
                     .frame(width: 340, height: 120)
+                    HStack(spacing: 25) {
+                        ForEach(0..<3) { index in
+                            Button(action: {
+                                selectedCalendarIndex = index
+                            }) {
+                                calendars[index].image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 80, height: 80)
+                                    .background(Color.gray.opacity(0.2))
+                                    .cornerRadius(14)
+                                    .overlay(selectedCalendarIndex == index ? RoundedRectangle(cornerRadius: 14).stroke(Color(red: 109/256, green: 99/256, blue: 226/256), lineWidth: 3) : nil)
+                            }
+                        }
+                    }.padding(50)
                     VStack (alignment: .center) {
                         NavigationLink(destination: ChooseCalendarView().navigationBarBackButtonHidden(true)) {
                             Text("Later")
