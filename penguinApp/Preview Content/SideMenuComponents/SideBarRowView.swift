@@ -8,11 +8,28 @@
 import SwiftUI
 
 struct SideBarRowView: View {
+    let option: SideBarOptionModel
+    @Binding var selectedOption: SideBarOptionModel?
+    
+    private var isSelected: Bool {
+        return selectedOption == option
+    }
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        HStack{
+            Image(systemName: option.systemImageName)
+                .imageScale(.small)
+            Text(option.title)
+                .font(.subheadline)
+            Spacer()
+        }
+        .padding(.leading)
+        .foregroundStyle(isSelected ? .purple : .primary)
+        .frame( width: 216, height: 44)
+        .background(isSelected ? .purple.opacity(0.15) : .clear)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
 
 #Preview {
-    SideBarRowView()
+    SideBarRowView(option: .calendar, selectedOption: .constant(.calendar))
 }
