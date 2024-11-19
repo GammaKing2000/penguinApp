@@ -13,10 +13,12 @@ struct ActivityPageView: View {
         colors: [Color.white, Color(red: 179 / 256, green: 193 / 256, blue: 221 / 256)],
         startPoint: .top, endPoint: .bottom)
     @State var showChooseActivity = false
+    @State var activitiesList = ["Football", "Basketball", "Bowling", "Kayaking", "Hiking", "Yoga", "Gaming", "Reading", "Cafe Hopping"]
+    @State var selectedActivities: [String] = []
     var body: some View {
         return Group {
             if showChooseActivity {
-                ChooseActivityView(backgroundGradient: $backgroundGradient)
+                ChooseActivityView(selectedActivities: $selectedActivities, backgroundGradient: $backgroundGradient, activitiesList: $activitiesList)
             }
             else {
                 ChooseCalendarView(showChooseActivity: $showChooseActivity, backgroundGradient: $backgroundGradient)
@@ -63,15 +65,15 @@ struct ChooseCalendarView: View {
 }
 
 struct ChooseActivityView: View {
-    let images = [
-        Image(.activity1Football), Image(.activity2Basketball),
-        Image(.activity3Bowling), Image(.activity4Kaya),
-        Image(.activity5Hiking), Image(.activity6Yoga),
-        Image(.activity7Game), Image(.activity8Coffee),
-        Image(.activity9Book)
-    ]
+    func chooseActivity() {
+        activitiesList.insert(activity, at:0)
+        selectedActivities.append(activity)
+        activity = ""
+    }
+    @Binding var selectedActivities: [String]
     @State var activity = ""
     @Binding var backgroundGradient: LinearGradient
+    @Binding var activitiesList: [String]
     var body: some View {
         ZStack {
             backgroundGradient
@@ -84,31 +86,27 @@ struct ChooseActivityView: View {
                         .font(.body)
                 }
                     .frame(width: 340, height: 120)
-                
-                Grid(horizontalSpacing: 20, verticalSpacing: 20) {
-                           ForEach(0..<3) { row in
-                               GridRow {
-                                   ForEach(0..<3) { column in
-                                       let index = row * 3 + column
-                                       if index < images.count {
-                                           images[index]
-                                               .resizable()
-                                               .aspectRatio(contentMode: .fill)
-                                               .frame(width: 100, height: 100)
-                                               .background(Color.gray.opacity(0.2))
-                                               .cornerRadius(14)
-                                       }
-                                   }
-                               }
-                           }
-                       }
-                       .padding()
+                List {
+                    ForEach(activitiesList, id: \.self){ activity in
+                        Text(activity)
+                            .fontWeight(selectedActivities.contains(activity) ? .bold : .light)
+                            .foregroundColor(selectedActivities.contains(activity) ? Color(red: 0.42745098039215684, green: 0.38823529411764707, blue: 0.8862745098039215): Color.black)
+                            .onTapGesture {
+                                selectedActivities.contains(activity) ? selectedActivities.removeAll { $0 == activity } : selectedActivities.append(activity)
+                            }
+                    }
+                }
+                .frame(width: 340, height: 460)
+                .scrollContentBackground(.hidden)
                 VStack (alignment: .center, spacing: 40) {
                     ZStack {
                         RoundedRectangle(cornerRadius: 10)
                             .foregroundStyle(Color.white)
                             .frame(width: 300, height: 50)
                         TextField("Type more activities...", text:$activity)
+                            .onSubmit {
+                                chooseActivity()
+                            }
                             .multilineTextAlignment(.center)
                     }
                     Button("Continue                                               ") {
@@ -119,7 +117,6 @@ struct ChooseActivityView: View {
                     .controlSize(.extraLarge)
                     .fontWeight(.semibold)
                 }
-                //            .frame(width: 340, height: 100)
             }
         }.ignoresSafeArea()
     }
