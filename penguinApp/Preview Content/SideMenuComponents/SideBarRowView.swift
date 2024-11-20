@@ -23,13 +23,13 @@ struct SideBarRowView: View {
             Spacer()
         }
         .padding(.leading)
-        .foregroundStyle(isSelected ? .purple : .primary)
+        .foregroundStyle(isSelected ? Color("AppPurple") : .primary)
         .frame( width: 216, height: 44)
-        .background(isSelected ? .purple.opacity(0.15) : .clear)
+        .background(isSelected ? Color("AppPurple").opacity(0.15) : .clear)
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
 
 #Preview {
-    SideBarRowView(option: .calendar, selectedOption: .constant(.calendar))
+    SideBarRowView(option: .newchat, selectedOption: .constant(.newchat))
 }
