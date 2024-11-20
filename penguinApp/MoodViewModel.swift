@@ -27,39 +27,31 @@ class MoodViewModel: ObservableObject {
 struct MoodModelView: View {
     @StateObject private var viewModel = MoodViewModel()
     @State private var chatInput: String = ""
-    @State private var isChatActive: Bool = false
+    @State private var navigateToChat: Bool = false
 
     let columns = [
         GridItem(.flexible()),
         GridItem(.flexible()),
         GridItem(.flexible())
     ]
-    
+
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ZStack {
                 LinearGradient(
-                    colors: [Color.white, Color(red: 179 / 256, green: 193 / 256, blue: 221 / 256)], startPoint: .top, endPoint: .bottom)
+                    colors: [Color.white, Color(red: 179 / 256, green: 193 / 256, blue: 221 / 256)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                NavigationLink(destination: ChatView(userInput: viewModel.selectedMood?.name ?? chatInput).navigationBarBackButtonHidden(true), isActive: $isChatActive) {
-                }
-                    .hidden()
-                    .navigationBarItems(
-                        leading: Button(action: {}) {
-                            Image(systemName: "line.horizontal.3")
-                        .imageScale(.large)
-                        },
-                        trailing: Button(action: {}) {
-                            Image(systemName: "plus")
-                        .imageScale(.large)
-                        }
-                    )
+
                 VStack {
                     Spacer()
-                    Text("Hi, Jess! How are you feeling today")
+                    Text("Hi, Jess! How are you feeling today?")
                         .font(.system(size: 32, weight: .bold))
                         .multilineTextAlignment(.leading)
                         .frame(width: 340)
+
                     LazyVGrid(columns: columns, spacing: 30) {
                         ForEach(viewModel.moods) { mood in
                             VStack {
@@ -67,22 +59,23 @@ struct MoodModelView: View {
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 100, height: 100)
-//                                    .padding(8)
-                                    .background(viewModel.selectedMood?.id == mood.id ?
-                                                Color.blue.opacity(0.2) : Color.clear)
+                                    .background(viewModel.selectedMood?.id == mood.id
+                                                ? Color.blue.opacity(0.2)
+                                                : Color.clear)
                                     .cornerRadius(10)
-                                
+
                                 Text(mood.name)
                                     .font(.system(size: 14))
                             }
                             .onTapGesture {
                                 viewModel.selectMood(mood)
-                                isChatActive = true // Navigate directly to the chat
+                                navigateToChat = true // Trigger navigation programmatically
                             }
                         }
                     }
                     .frame(maxWidth: 340)
                     .padding(EdgeInsets(top: 30, leading: 0, bottom: 200, trailing: 0))
+
                     // Chat input box with paper plane icon
                     HStack {
                         TextField("Tell me how you're feeling...", text: $chatInput)
@@ -93,10 +86,10 @@ struct MoodModelView: View {
                                 RoundedRectangle(cornerRadius: 20)
                                     .stroke(Color.gray, lineWidth: 1)
                             )
-                        
+
                         Button(action: {
                             if !chatInput.isEmpty {
-                                isChatActive = true
+                                navigateToChat = true
                             }
                         }) {
                             Image(systemName: "paperplane.fill")
@@ -109,7 +102,22 @@ struct MoodModelView: View {
                     .frame(maxWidth: 340)
                 }
                 .frame(width: 340, height: 700)
-            }.ignoresSafeArea()
+            }
+            .ignoresSafeArea()
+            .navigationBarItems(
+                leading: Button(action: {}) {
+                    Image(systemName: "line.horizontal.3")
+                        .imageScale(.large)
+                },
+                trailing: Button(action: {}) {
+                    Image(systemName: "plus")
+                        .imageScale(.large)
+                }
+            )
+            .navigationDestination(isPresented: $navigateToChat) {
+                ChatView(userInput: viewModel.selectedMood?.name ?? chatInput)
+                    .navigationBarBackButtonHidden(true)
+            }
         }
     }
 }
