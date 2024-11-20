@@ -29,7 +29,7 @@ struct ChooseCalendarView: View {
                     }
                     .frame(width: 340, height: 120)
                     HStack(spacing: 25) {
-                        ForEach(0..<3) { index in
+                        ForEach(0..<2) { index in
                             Button(action: {
                                 selectedCalendarIndex = index
                             }) {

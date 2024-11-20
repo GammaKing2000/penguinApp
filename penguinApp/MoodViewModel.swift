@@ -28,6 +28,9 @@ struct MoodModelView: View {
     @StateObject private var viewModel = MoodViewModel()
     @State private var chatInput: String = ""
     @State private var navigateToChat: Bool = false
+    @State private var showSideBar = false
+    @State private var messages: [ChatMessage] = []
+    @State private var userInput: String = ""
 
     let columns = [
         GridItem(.flexible()),
@@ -44,39 +47,76 @@ struct MoodModelView: View {
                     endPoint: .bottom
                 )
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-
+                .ignoresSafeArea()
                 VStack {
-                    Spacer()
-                    Text("Hi, Jess! How are you feeling today?")
-                        .font(.system(size: 32, weight: .bold))
-                        .multilineTextAlignment(.leading)
-                        .frame(width: 340)
-
-                    LazyVGrid(columns: columns, spacing: 30) {
-                        ForEach(viewModel.moods) { mood in
-                            VStack {
-                                Image(mood.imageName)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 100, height: 100)
-                                    .background(viewModel.selectedMood?.id == mood.id
-                                                ? Color.blue.opacity(0.2)
-                                                : Color.clear)
-                                    .cornerRadius(10)
-
-                                Text(mood.name)
-                                    .font(.system(size: 14))
+                    if !navigateToChat {
+                        VStack {
+                            Spacer()
+                            Text("Hi, Jess! How are you feeling today?")
+                                .font(.system(size: 32, weight: .bold))
+                                .multilineTextAlignment(.leading)
+                                .frame(width: 340)
+                            
+                            LazyVGrid(columns: columns, spacing: 30) {
+                                ForEach(viewModel.moods) { mood in
+                                    VStack {
+                                        Image(mood.imageName)
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 100, height: 100)
+                                            .background(viewModel.selectedMood?.id == mood.id
+                                                        ? Color.blue.opacity(0.2)
+                                                        : Color.clear)
+                                            .cornerRadius(10)
+                                        
+                                        Text(mood.name)
+                                            .font(.system(size: 14))
+                                    }
+                                    .onTapGesture {
+                                        viewModel.selectMood(mood)
+                                        messages.append(ChatMessage(isUser: false, text: "Hi, Jess! Are you feeling " + mood.name.lowercased() + " today?"))
+                                        navigateToChat = true // Trigger navigation programmatically
+                                    }
+                                }
                             }
-                            .onTapGesture {
-                                viewModel.selectMood(mood)
-                                navigateToChat = true // Trigger navigation programmatically
+                            .frame(maxWidth: 340)
+                            .padding(EdgeInsets(top: 30, leading: 0, bottom: 200, trailing: 0))
+                            
+                            // Chat input box with paper plane icon
+                        }
+                        .frame(width: 340, height: 700)
+                    }
+                    else {
+                        VStack {
+                            // Chat Messages
+                            ScrollView {
+                                VStack(alignment: .leading, spacing: 10) {
+                                    ForEach(messages) { message in
+                                        HStack {
+                                            if message.isUser {
+                                                Spacer()
+                                                Text(message.text)
+                                                    .padding()
+                                                    .foregroundColor(.white)
+                                                    .background(Color.blue)
+                                                    .cornerRadius(15)
+                                                    .frame(maxWidth: 250, alignment: .trailing)
+                                            } else {
+                                                Text(message.text)
+                                                    .padding()
+                                                    .foregroundColor(.black)
+                                                    .background(Color.gray.opacity(0.2))
+                                                    .cornerRadius(15)
+                                                    .frame(maxWidth: 250, alignment: .leading)
+                                                Spacer()
+                                            }
+                                        }
+                                    }
+                                }
+                                .padding()
                             }
                         }
                     }
-                    .frame(maxWidth: 340)
-                    .padding(EdgeInsets(top: 30, leading: 0, bottom: 200, trailing: 0))
-
-                    // Chat input box with paper plane icon
                     HStack {
                         TextField("Tell me how you're feeling...", text: $chatInput)
                             .padding(10)
@@ -86,7 +126,7 @@ struct MoodModelView: View {
                                 RoundedRectangle(cornerRadius: 20)
                                     .stroke(Color.gray, lineWidth: 1)
                             )
-
+                        
                         Button(action: {
                             if !chatInput.isEmpty {
                                 navigateToChat = true
@@ -95,29 +135,28 @@ struct MoodModelView: View {
                             Image(systemName: "paperplane.fill")
                                 .foregroundColor(.white)
                                 .padding(10)
-                                .background(Color.black)
+                                .background(Color("AppPurple"))
                                 .clipShape(Circle())
                         }
                     }
                     .frame(maxWidth: 340)
                 }
-                .frame(width: 340, height: 700)
+                .navigationBarItems(
+                    leading: Button(action: {showSideBar.toggle()}) {
+                        Image(systemName: "line.horizontal.3")
+                            .imageScale(.large)
+                    },
+                    trailing: Button(action: {}) {
+                        Image(systemName: "plus")
+                            .imageScale(.large)
+                    }
+                )
+                SideBarView(isShowing: $showSideBar)
             }
-            .ignoresSafeArea()
-            .navigationBarItems(
-                leading: Button(action: {}) {
-                    Image(systemName: "line.horizontal.3")
-                        .imageScale(.large)
-                },
-                trailing: Button(action: {}) {
-                    Image(systemName: "plus")
-                        .imageScale(.large)
-                }
-            )
-            .navigationDestination(isPresented: $navigateToChat) {
-                ChatView(userInput: viewModel.selectedMood?.name ?? chatInput)
-                    .navigationBarBackButtonHidden(true)
-            }
+//            .navigationDestination(isPresented: $navigateToChat) {
+//                ChatView(userInput: viewModel.selectedMood?.name ?? chatInput)
+//                    .navigationBarBackButtonHidden(true)
+//            }
         }
     }
 }
@@ -148,6 +187,9 @@ struct MoodViewModel_Previews: PreviewProvider {
     }
 }
 
+
+
+
 //import SwiftUI
 //
 //class MoodViewModel: ObservableObject {
@@ -170,84 +212,87 @@ struct MoodViewModel_Previews: PreviewProvider {
 //struct MoodModelView: View {
 //    @StateObject private var viewModel = MoodViewModel()
 //    @State private var chatInput: String = ""
-//    @State private var isChatActive: Bool = false
+//    @State private var navigateToChat: Bool = false
+//    @State private var showSideBar = false
 //
 //    let columns = [
 //        GridItem(.flexible()),
 //        GridItem(.flexible()),
 //        GridItem(.flexible())
 //    ]
-//    
-//    var body: some View {
-//        NavigationView {
-//            VStack(spacing: 20) {
-//                Text("Hi, Jess!")
-//                    .font(.system(size: 32, weight: .bold))
-//                
-//                Text("How are you feeling today?")
-//                    .font(.system(size: 24, weight: .bold))
-//                
-//                LazyVGrid(columns: columns, spacing: 20) {
-//                    ForEach(viewModel.moods) { mood in
-//                        VStack {
-//                            Image(mood.imageName)
-//                                .resizable()
-//                                .scaledToFit()
-//                                .frame(width: 80, height: 80)
-//                                .padding(8)
-//                                .background(viewModel.selectedMood?.id == mood.id ?
-//                                          Color.blue.opacity(0.2) : Color.clear)
-//                                .cornerRadius(10)
-//                            
-//                            Text(mood.name)
-//                                .font(.system(size: 14))
-//                        }
-//                        .onTapGesture {
-//                            viewModel.selectMood(mood)
-//                            isChatActive = true // Navigate directly to the chat
-//                        }
-//                    }
-//                }
-//                .padding()
-//                
-//                Spacer()
 //
-//                // Chat input box with paper plane icon
-//                HStack {
-//                    TextField("Tell me how you're feeling...", text: $chatInput)
-//                        .padding(10)
-//                        .background(Color.gray.opacity(0.2))
-//                        .cornerRadius(20)
-//                        .overlay(
-//                            RoundedRectangle(cornerRadius: 20)
-//                                .stroke(Color.gray, lineWidth: 1)
-//                        )
-//                    
-//                    Button(action: {
-//                        if !chatInput.isEmpty {
-//                            isChatActive = true
+//    var body: some View {
+//        NavigationStack {
+//            ZStack {
+//                LinearGradient(
+//                    colors: [Color.white, Color(red: 179 / 256, green: 193 / 256, blue: 221 / 256)],
+//                    startPoint: .top,
+//                    endPoint: .bottom
+//                )
+//                .frame(maxWidth: .infinity, maxHeight: .infinity)
+//                .ignoresSafeArea()
+//
+//                VStack {
+//                    Spacer()
+//                    Text("Hi, Jess! How are you feeling today?")
+//                        .font(.system(size: 32, weight: .bold))
+//                        .multilineTextAlignment(.leading)
+//                        .frame(width: 340)
+//
+//                    LazyVGrid(columns: columns, spacing: 30) {
+//                        ForEach(viewModel.moods) { mood in
+//                            VStack {
+//                                Image(mood.imageName)
+//                                    .resizable()
+//                                    .scaledToFit()
+//                                    .frame(width: 100, height: 100)
+//                                    .background(viewModel.selectedMood?.id == mood.id
+//                                                ? Color.blue.opacity(0.2)
+//                                                : Color.clear)
+//                                    .cornerRadius(10)
+//
+//                                Text(mood.name)
+//                                    .font(.system(size: 14))
+//                            }
+//                            .onTapGesture {
+//                                viewModel.selectMood(mood)
+//                                navigateToChat = true // Trigger navigation programmatically
+//                            }
 //                        }
-//                    }) {
-//                        Image(systemName: "paperplane.fill")
-//                            .foregroundColor(.white)
-//                            .padding(10)
-//                            .background(Color.black)
-//                            .clipShape(Circle())
 //                    }
+//                    .frame(maxWidth: 340)
+//                    .padding(EdgeInsets(top: 30, leading: 0, bottom: 200, trailing: 0))
+//
+//                    // Chat input box with paper plane icon
+//                    HStack {
+//                        TextField("Tell me how you're feeling...", text: $chatInput)
+//                            .padding(10)
+//                            .background(Color.gray.opacity(0.2))
+//                            .cornerRadius(20)
+//                            .overlay(
+//                                RoundedRectangle(cornerRadius: 20)
+//                                    .stroke(Color.gray, lineWidth: 1)
+//                            )
+//
+//                        Button(action: {
+//                            if !chatInput.isEmpty {
+//                                navigateToChat = true
+//                            }
+//                        }) {
+//                            Image(systemName: "paperplane.fill")
+//                                .foregroundColor(.white)
+//                                .padding(10)
+//                                .background(Color.black)
+//                                .clipShape(Circle())
+//                        }
+//                    }
+//                    .frame(maxWidth: 340)
 //                }
-//                .padding(.horizontal)
-//                .padding(.bottom, 20)
+//                .frame(width: 340, height: 700)
+//                SideBarView(isShowing: $showSideBar)
 //            }
-//            .padding(.top, 40)
-//            .background(
-//                NavigationLink(destination: ChatView(userInput: viewModel.selectedMood?.name ?? chatInput).navigationBarBackButtonHidden(true),
-//                               isActive: $isChatActive) {
-//                    EmptyView()
-//                }
-//                .hidden()
-//            )
 //            .navigationBarItems(
-//                leading: Button(action: {}) {
+//                leading: Button(action: {showSideBar.toggle()}) {
 //                    Image(systemName: "line.horizontal.3")
 //                        .imageScale(.large)
 //                },
@@ -256,6 +301,10 @@ struct MoodViewModel_Previews: PreviewProvider {
 //                        .imageScale(.large)
 //                }
 //            )
+//            .navigationDestination(isPresented: $navigateToChat) {
+//                ChatView(userInput: viewModel.selectedMood?.name ?? chatInput)
+//                    .navigationBarBackButtonHidden(true)
+//            }
 //        }
 //    }
 //}
@@ -285,3 +334,5 @@ struct MoodViewModel_Previews: PreviewProvider {
 //        MoodModelView()
 //    }
 //}
+//
+//
