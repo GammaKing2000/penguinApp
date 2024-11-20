@@ -14,12 +14,12 @@ struct SideBarHeaderView: View {
                 .imageScale(.large)
                 .foregroundStyle(.white)
                 .frame(width: 48, height: 48)
-                .background(.blue)
+                .background(Color("AppPurple"))
                 .clipShape(RoundedRectangle(cornerRadius: 10))
                 .padding(.vertical)
             VStack(alignment: .leading, spacing: 6){
                 Text("John Doe")
-                
+                    .fontWeight(.semibold)
                 Text("johndoe@example.com")
                     .font(.footnote)
                     .tint(.gray)
