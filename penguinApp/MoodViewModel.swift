@@ -32,9 +32,16 @@ struct MoodModelView: View {
     @State private var messages: [ChatMessage] = []
     @State private var userInput: String = ""
     @State private var history: String = ""
+    
+    @State private var isLoading: Bool = false
+    @State private var dotCount: Int = 0
+
     @FocusState private var isInputFocused: Bool // New focus state
     @State private var temp: String = ""
     @Binding var selectedActivities: [String]
+    
+    let dotTimer = Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()
+
 
     let columns = [
         GridItem(.flexible()),
@@ -45,10 +52,12 @@ struct MoodModelView: View {
     func sendMessageToLLM() {
         let prompt = temp
         let hist = history
+        isLoading = true
         NetworkManager.shared.sendChatRequest(prompt: prompt, history: hist, interestList: selectedActivities) { response in
             guard let response = response else { return }
             chatInput = ""
             DispatchQueue.main.async {
+                isLoading = false
 //                messages.append(ChatMessage(isUser: true, text: prompt))
                 messages.append(ChatMessage(isUser: false, text: response.response))
                 history = response.history
@@ -127,17 +136,36 @@ struct MoodModelView: View {
                                                     Spacer()
                                                 }
                                             }
-                                            .id(message.id) // Add unique id for scrolling
+                                            .id(message.id)
+                                        }
+
+                                        // Display animated dots when loading
+                                        if isLoading {
+                                            HStack {
+                                                Text(String(repeating: ".", count: dotCount % 4)) // Cycle through 0-3 dots
+                                                    .font(.system(size: 32, weight: .bold))
+                                                    .foregroundColor(.gray)
+                                                    .opacity(0.8)
+                                                    .animation(.easeInOut(duration: 0.5), value: dotCount)
+                                                Spacer()
+                                            }
+                                            .id(UUID()) // Unique ID to ensure proper scrolling
                                         }
                                     }
                                     .padding()
                                 }
                                 .onChange(of: messages.count) { _ in
-                                    // Scroll to the last message when new message is added
                                     withAnimation {
-                                        proxy.scrollTo(messages.last?.id, anchor: .bottom)
+                                        if let lastMessageId = messages.last?.id {
+                                            proxy.scrollTo(lastMessageId, anchor: .bottom)
+                                        }
                                     }
                                 }
+                                .onReceive(dotTimer) { _ in
+                                    if isLoading {
+                                        dotCount += 1
+                                            }
+                                        }
                                 // Add gesture to dismiss or show keyboard
                                 .gesture(
                                     DragGesture()
