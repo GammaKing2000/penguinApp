@@ -30,7 +30,7 @@ struct MoodModelView: View {
     @State private var navigateToChat: Bool = false
     @State private var showSideBar = false
     @State private var messages: [ChatMessage] = []
-    @State private var userInput: String = ""
+    @FocusState private var isInputFocused: Bool // New focus state
 
     let columns = [
         GridItem(.flexible()),
@@ -73,55 +73,72 @@ struct MoodModelView: View {
                                     .onTapGesture {
                                         viewModel.selectMood(mood)
                                         messages.append(ChatMessage(isUser: false, text: "Hi, Jess! Are you feeling " + mood.name.lowercased() + " today?"))
-                                        navigateToChat = true // Trigger navigation programmatically
+                                        navigateToChat = true
                                     }
                                 }
                             }
                             .frame(maxWidth: 340, maxHeight: 500)
-//                            .padding(EdgeInsets(top: 30, leading: 0, bottom: 200, trailing: 0))
-                            
-                            // Chat input box with paper plane icon
                         }
                         .frame(width: 340)
                     }
                     else {
                         VStack {
-                            // Chat Messages
-                            ScrollView {
-                                VStack(alignment: .leading, spacing: 10) {
-                                    ForEach(messages) { message in
-                                        HStack {
-                                            if message.isUser {
-                                                Spacer()
-                                                Text(message.text)
-                                                    .padding()
-                                                    .foregroundColor(.white)
-                                                    .background(Color("AppPurple"))
-                                                    .cornerRadius(15)
-                                                    .frame(maxWidth: 250, alignment: .trailing)
-                                            } else {
-                                                Text(message.text)
-                                                    .padding()
-                                                    .foregroundColor(.black)
-                                                    .background(Color.gray.opacity(0.2))
-                                                    .cornerRadius(15)
-                                                    .frame(maxWidth: 250, alignment: .leading)
-                                                Spacer()
+                            // Chat Messages with ScrollView and ScrollViewReader
+                            ScrollViewReader { proxy in
+                                ScrollView {
+                                    VStack(alignment: .leading, spacing: 10) {
+                                        ForEach(messages) { message in
+                                            HStack {
+                                                if message.isUser {
+                                                    Spacer()
+                                                    Text(message.text)
+                                                        .padding()
+                                                        .foregroundColor(.white)
+                                                        .background(Color("AppPurple"))
+                                                        .cornerRadius(15)
+                                                        .frame(maxWidth: 250, alignment: .trailing)
+                                                } else {
+                                                    Text(message.text)
+                                                        .padding()
+                                                        .foregroundColor(.black)
+                                                        .background(Color.gray.opacity(0.2))
+                                                        .cornerRadius(15)
+                                                        .frame(maxWidth: 250, alignment: .leading)
+                                                    Spacer()
+                                                }
                                             }
+                                            .id(message.id) // Add unique id for scrolling
                                         }
                                     }
+                                    .padding()
                                 }
-                                .padding()
+                                .onChange(of: messages.count) { _ in
+                                    // Scroll to the last message when new message is added
+                                    withAnimation {
+                                        proxy.scrollTo(messages.last?.id, anchor: .bottom)
+                                    }
+                                }
+                                // Add gesture to dismiss or show keyboard
+                                .gesture(
+                                    DragGesture()
+                                        .onChanged { value in
+                                            if value.translation.height > 0 {
+                                                // Dismiss keyboard when dragging down
+                                                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                                            } else {
+                                                // Show keyboard when dragging up
+                                                isInputFocused = true
+                                            }
+                                        }
+                                )
                             }
                         }
                     }
                     HStack {
-                        TextField("Tell me how you're feeling...", text: $chatInput)
-                            .onSubmit {
-                                messages.append(ChatMessage(isUser: true, text: chatInput))
-                                navigateToChat = true
-                                chatInput.removeAll()
-                            }
+                        TextField("Tell me how you're feeling...", text: $chatInput, axis: .vertical) // Add vertical axis
+                            .lineLimit(4) // Limit to 4 lines
+                            .focused($isInputFocused) // Connect focus state
+                            .textFieldStyle(PlainTextFieldStyle()) // Remove default styling
                             .padding(10)
                             .background(Color.gray.opacity(0.2))
                             .cornerRadius(20)
@@ -132,9 +149,7 @@ struct MoodModelView: View {
                         
                         Button(action: {
                             if !chatInput.isEmpty {
-                                messages.append(ChatMessage(isUser: true, text: chatInput))
-                                chatInput.removeAll()
-                                navigateToChat = true
+                                sendMessage()
                             }
                         }) {
                             Image(systemName: "paperplane.fill")
@@ -160,25 +175,13 @@ struct MoodModelView: View {
             )
         }
     }
-}
-
-struct ChatView: View {
-    let userInput: String
-
-    var body: some View {
-        VStack {
-            Text("Chat with AI")
-                .font(.largeTitle)
-                .padding()
-
-            ScrollView {
-                Text("You feel: \(userInput)")
-                    .padding()
-            }
-
-            Spacer()
-        }
-        .navigationTitle("AI Chat")
+    
+    // Separate method to send message
+    private func sendMessage() {
+        messages.append(ChatMessage(isUser: true, text: chatInput))
+        navigateToChat = true
+        chatInput = "" // Clear input
+        // isInputFocused = false // Optionally dismiss keyboard after sending
     }
 }
 
