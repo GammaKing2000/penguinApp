@@ -10,6 +10,7 @@ import SwiftUI
 struct SideBarView: View {
     @Binding var isShowing: Bool
     @State var selectedOption: SideBarOptionModel?
+    @State var isNavigatingToMoodView: Bool = false
     var body: some View {
         ZStack {
             if isShowing {
@@ -26,6 +27,9 @@ struct SideBarView: View {
                             ForEach(SideBarOptionModel.allCases) { option in
                                 Button(action: {
                                     selectedOption = option
+                                    if option == .newchat {
+                                        isNavigatingToMoodView = true
+                                    }
                                 }, label: {
                                     SideBarRowView(option: option, selectedOption: $selectedOption)
                                 })
@@ -44,6 +48,13 @@ struct SideBarView: View {
         }
         .transition(.move(edge: .leading))
         .animation(.smooth, value: isShowing)
+        .background(
+            NavigationLink(
+                destination: MoodModelView().navigationBarBackButtonHidden(true),
+                isActive: $isNavigatingToMoodView,
+                label: { EmptyView() }
+            )
+        )
     }
 }
 

@@ -72,7 +72,7 @@ struct ChooseActivityView: View {
                                    }
                                    .multilineTextAlignment(.center)
                            }
-                           NavigationLink(destination: MoodModelView().navigationBarBackButtonHidden(true)) {
+                           NavigationLink(destination: MoodModelView(navigateToChat: false).navigationBarBackButtonHidden(true)) {
                                Text("Continue")
                                    .fontWeight(.semibold)
                                    .foregroundColor(.white)

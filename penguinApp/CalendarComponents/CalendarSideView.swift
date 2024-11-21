@@ -5,6 +5,9 @@ struct MonthlyCalendarView: View {
     @State private var currentDate = Date() // Current displayed date
     @State private var selectedDate: Date? = nil // Tracks the selected date
     @State private var isSheetShowing: Bool = false // Controls sheet visibility
+    @Binding var navigateToChat: Bool
+    
+    @Environment(\.dismiss) private var dismissCalendar
     
     var body: some View {
         NavigationStack {
@@ -52,6 +55,7 @@ struct MonthlyCalendarView: View {
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 80) {
                     ForEach(days, id: \.self) { day in
                         if day != 0 {
+                            let isToday = today(for: currentDate) == day // Check if this day is today
                             Button(action: {
                                 selectedDate = createDate(day: day, for: currentDate)
                                 isSheetShowing = true // Show the sheet
@@ -62,14 +66,20 @@ struct MonthlyCalendarView: View {
                                     .frame(maxWidth: .infinity)
                                     .background(
                                         selectedDate == createDate(day: day, for: currentDate)
-                                            ? Color(red: 109/255, green: 99/255, blue: 226/255).opacity(0.2) // Purple for selected date
-                                        : Color.clear // Default
+                                        ? Color("Apppurple").opacity(0.2) // Purple for selected date
+                                            : Color.clear // Default
                                     )
                                     .cornerRadius(8)
                                     .foregroundColor(
                                         selectedDate == createDate(day: day, for: currentDate)
                                             ? Color(red: 109/255, green: 99/255, blue: 226/255)
                                             : Color.black
+                                    )
+                                    .overlay(
+                                        isToday
+                                            ? Circle()
+                                            .stroke(lineWidth: 2) // Circle for today
+                                            : nil
                                     )
                             }
                         } else {
@@ -78,16 +88,25 @@ struct MonthlyCalendarView: View {
                         }
                     }
                 }
+
                 .padding(.horizontal)
 
                 Spacer() // Ensures layout flexibility
             }
             .navigationTitle("Calendar")
             .navigationBarBackButtonHidden(false)
-            .navigationBarItems(leading: NavigationLink(destination: AiChatView().navigationBarBackButtonHidden(true)) {
-                Spacer()
-                Image(.chatIcon)
-            })
+            .navigationBarItems(
+//                leading: NavigationLink(destination: MoodModelView(navigateToChat: navigateToChat).navigationBarBackButtonHidden(true)) {
+//                Spacer()
+//                Image(.chatIcon)
+//                
+                leading: Button {
+                    dismissCalendar()
+                } label: {
+                    Image(.chatIcon)
+                }
+            )
+            
             .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $isSheetShowing) { // Present the sheet
                 if let selectedDate = selectedDate {
@@ -190,6 +209,6 @@ struct DayDetailView: View {
 
 struct MonthlyCalendarView_Previews: PreviewProvider {
     static var previews: some View {
-        MonthlyCalendarView()
+        MonthlyCalendarView(navigateToChat: .constant(false))
     }
 }
