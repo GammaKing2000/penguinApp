@@ -34,6 +34,7 @@ struct MoodModelView: View {
     @State private var history: String = ""
     @FocusState private var isInputFocused: Bool // New focus state
     @State private var temp: String = ""
+    @Binding var selectedActivities: [String]
 
     let columns = [
         GridItem(.flexible()),
@@ -44,7 +45,7 @@ struct MoodModelView: View {
     func sendMessageToLLM() {
         let prompt = temp
         let hist = history
-        NetworkManager.shared.sendChatRequest(prompt: prompt, history: hist) { response in
+        NetworkManager.shared.sendChatRequest(prompt: prompt, history: hist, interestList: selectedActivities) { response in
             guard let response = response else { return }
             chatInput = ""
             DispatchQueue.main.async {
@@ -214,6 +215,6 @@ struct MoodModelView: View {
 
 struct MoodViewModel_Previews: PreviewProvider {
     static var previews: some View {
-        MoodModelView()
+        MoodModelView(selectedActivities: .constant([]))
     }
 }
