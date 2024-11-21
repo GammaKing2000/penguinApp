@@ -10,6 +10,7 @@ import Foundation
 struct ChatRequest: Codable {
     let prompt: String
     let hist_data: String
+    let interests: [String]
 }
 
 struct ChatResponse: Codable {
@@ -23,14 +24,14 @@ class NetworkManager {
     
     private init() {}
     
-    func sendChatRequest(prompt: String, history: String, completion: @escaping (ChatResponse?) -> Void) {
+    func sendChatRequest(prompt: String, history: String, interestList: [String], completion: @escaping (ChatResponse?) -> Void) {
         guard let url = URL(string: baseURL) else { return }
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        let chatRequest = ChatRequest(prompt: prompt, hist_data: history)
+        let chatRequest = ChatRequest(prompt: prompt, hist_data: history, interests: interestList)
         guard let body = try? JSONEncoder().encode(chatRequest) else { return }
         request.httpBody = body
         
