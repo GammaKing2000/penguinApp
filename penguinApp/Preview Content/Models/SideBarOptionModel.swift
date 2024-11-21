@@ -26,7 +26,7 @@ enum SideBarOptionModel: Int, CaseIterable {
         switch self {
         case .newchat: return "plus.circle.fill"
         case .profile: return "person.crop.circle.fill"
-        case .history: return "hourglass.bottomhalf.filled"
+        case .history: return "chart.bar.horizontal.page"
         case .settings: return "gearshape.fill"
         }
     }

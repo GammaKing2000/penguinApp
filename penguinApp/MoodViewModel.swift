@@ -1,3 +1,10 @@
+//
+//  MoodViewModel.swift
+//  Penguin
+//
+//  Created by Karman Fung on 18/11/2024.
+//
+
 import SwiftUI
 
 class MoodViewModel: ObservableObject {
@@ -17,12 +24,12 @@ class MoodViewModel: ObservableObject {
     }
 }
 
-struct View: View {
+struct MoodModelView: View {
     @StateObject private var viewModel = MoodViewModel()
     @State private var chatInput: String = ""
-    @State var navigateToChat: Bool = false
+    @State private var navigateToChat: Bool = false
     @State private var showSideBar = false
-    @State var messages: [ChatMessage] = []
+    @State private var messages: [ChatMessage] = []
     @State private var userInput: String = ""
     @State private var history: String = ""
     
@@ -51,6 +58,7 @@ struct View: View {
             chatInput = ""
             DispatchQueue.main.async {
                 isLoading = false
+//                messages.append(ChatMessage(isUser: true, text: prompt))
                 messages.append(ChatMessage(isUser: false, text: response.response))
                 history = response.history
             }
@@ -101,7 +109,8 @@ struct View: View {
                             .frame(maxWidth: 340, maxHeight: 500)
                         }
                         .frame(width: 340)
-                    } else {
+                    }
+                    else {
                         VStack {
                             // Chat Messages with ScrollView and ScrollViewReader
                             ScrollViewReader { proxy in
@@ -174,10 +183,10 @@ struct View: View {
                         }
                     }
                     HStack {
-                        TextField("Tell me how you're feeling...", text: $chatInput, axis: .vertical)
-                            .lineLimit(4)
-                            .focused($isInputFocused)
-                            .textFieldStyle(PlainTextFieldStyle())
+                        TextField("Tell me how you're feeling...", text: $chatInput, axis: .vertical) // Add vertical axis
+                            .lineLimit(4) // Limit to 4 lines
+                            .focused($isInputFocused) // Connect focus state
+                            .textFieldStyle(PlainTextFieldStyle()) // Remove default styling
                             .padding(10)
                             .background(Color.gray.opacity(0.2))
                             .cornerRadius(20)
@@ -199,14 +208,9 @@ struct View: View {
                             Image(systemName: "paperplane.fill")
                                 .foregroundColor(.white)
                                 .padding(10)
-                                .background(
-                                    chatInput.isEmpty
-                                        ? Color.gray // Grey when input is empty
-                                        : Color("AppPurple") // Purple when input is not empty
-                                )
+                                .background(Color("AppPurple"))
                                 .clipShape(Circle())
                         }
-                        .disabled(chatInput.isEmpty) // Disable the button when the input is empty
                     }
                     .frame(maxWidth: 340)
                 }
@@ -216,12 +220,10 @@ struct View: View {
                 leading: Button(action: {showSideBar.toggle()}) {
                     Image(systemName: "line.horizontal.3")
                         .imageScale(.large)
-                        .foregroundStyle(Color("AppPurple"))
                 },
-                trailing: NavigationLink(destination: MonthlyCalendarView(navigateToChat: $navigateToChat).navigationBarBackButtonHidden(true)) {
-                    Image(systemName: "calendar")
+                trailing: Button(action: {}) {
+                    Image(systemName: "plus")
                         .imageScale(.large)
-                        .foregroundStyle(Color("AppPurple"))
                 }
             )
         }
@@ -234,6 +236,8 @@ struct View: View {
         messages.append(ChatMessage(isUser: true, text: chatInput))
         navigateToChat = true
         chatInput.removeAll()
+         // Clear input
+        // isInputFocused = false // Optionally dismiss keyboard after sending
     }
 }
 
