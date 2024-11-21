@@ -30,6 +30,8 @@ struct MoodModelView: View {
     @State private var navigateToChat: Bool = false
     @State private var showSideBar = false
     @State private var messages: [ChatMessage] = []
+    @State private var userInput: String = ""
+    @State private var history: String = ""
     @FocusState private var isInputFocused: Bool // New focus state
 
     let columns = [
@@ -37,6 +39,20 @@ struct MoodModelView: View {
         GridItem(.flexible()),
         GridItem(.flexible())
     ]
+    
+    func sendMessageToLLM() {
+        let prompt = chatInput
+        let hist = history
+        NetworkManager.shared.sendChatRequest(prompt: prompt, history: hist) { response in
+            guard let response = response else { return }
+            DispatchQueue.main.async {
+//                messages.append(ChatMessage(isUser: true, text: prompt))
+                messages.append(ChatMessage(isUser: false, text: response.response))
+                history = response.history
+                chatInput = ""
+            }
+        }
+    }
 
     var body: some View {
         NavigationStack {
@@ -146,10 +162,15 @@ struct MoodModelView: View {
                                 RoundedRectangle(cornerRadius: 20)
                                     .stroke(Color.gray, lineWidth: 1)
                             )
+                            .onSubmit {
+                                sendMessageToChat()
+                                sendMessageToLLM()
+                            }
                         
                         Button(action: {
                             if !chatInput.isEmpty {
-                                sendMessage()
+                                sendMessageToChat()
+                                sendMessageToLLM()
                             }
                         }) {
                             Image(systemName: "paperplane.fill")
@@ -177,7 +198,8 @@ struct MoodModelView: View {
     }
     
     // Separate method to send message
-    private func sendMessage() {
+
+    private func sendMessageToChat() {
         messages.append(ChatMessage(isUser: true, text: chatInput))
         navigateToChat = true
         chatInput = "" // Clear input
