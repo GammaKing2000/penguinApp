@@ -33,6 +33,7 @@ struct MoodModelView: View {
     @State private var userInput: String = ""
     @State private var history: String = ""
     @FocusState private var isInputFocused: Bool // New focus state
+    @State private var temp: String = ""
 
     let columns = [
         GridItem(.flexible()),
@@ -41,15 +42,15 @@ struct MoodModelView: View {
     ]
     
     func sendMessageToLLM() {
-        let prompt = chatInput
+        let prompt = temp
         let hist = history
         NetworkManager.shared.sendChatRequest(prompt: prompt, history: hist) { response in
             guard let response = response else { return }
+            chatInput = ""
             DispatchQueue.main.async {
 //                messages.append(ChatMessage(isUser: true, text: prompt))
                 messages.append(ChatMessage(isUser: false, text: response.response))
                 history = response.history
-                chatInput = ""
             }
         }
     }
@@ -88,8 +89,10 @@ struct MoodModelView: View {
                                     }
                                     .onTapGesture {
                                         viewModel.selectMood(mood)
-                                        messages.append(ChatMessage(isUser: false, text: "Hi, Jess! Are you feeling " + mood.name.lowercased() + " today?"))
+//                                        messages.append(ChatMessage(isUser: false, text: "Hi, Jess! Are you feeling " + mood.name.lowercased() + " today?"))
                                         navigateToChat = true
+                                        temp = "the user is feeling " + mood.name.lowercased() + " today. Please ask the user why are they feeling " + mood.name.lowercased()
+                                        sendMessageToLLM()
                                     }
                                 }
                             }
@@ -200,9 +203,11 @@ struct MoodModelView: View {
     // Separate method to send message
 
     private func sendMessageToChat() {
+        temp = chatInput
         messages.append(ChatMessage(isUser: true, text: chatInput))
         navigateToChat = true
-        chatInput = "" // Clear input
+        chatInput.removeAll()
+         // Clear input
         // isInputFocused = false // Optionally dismiss keyboard after sending
     }
 }
