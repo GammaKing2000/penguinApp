@@ -198,6 +198,7 @@ struct MoodModelView: View {
     }
     
     // Separate method to send message
+
     private func sendMessageToChat() {
         messages.append(ChatMessage(isUser: true, text: chatInput))
         navigateToChat = true
