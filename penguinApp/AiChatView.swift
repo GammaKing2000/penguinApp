@@ -70,7 +70,7 @@ struct AiChatView: View {
                     .padding()
                 }
                 
-                SideBarView(isShowing: $showSideBar)
+//                SideBarView(isShowing: $showSideBar)
             }
             .toolbar(showSideBar ? .hidden : .visible,for: .navigationBar)
             .navigationTitle("Chat")

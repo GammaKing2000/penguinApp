@@ -20,7 +20,7 @@ struct ChatResponse: Codable {
 
 class NetworkManager {
     static let shared = NetworkManager()
-    private let baseURL = "http://192.168.210.60:8080/chat"
+    private let baseURL = "http://172.20.10.4:8080/chat"
     
     private init() {}
     

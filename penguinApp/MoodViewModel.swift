@@ -17,7 +17,7 @@ class MoodViewModel: ObservableObject {
     }
 }
 
-struct View: View {
+struct MoodModelView: View {
     @StateObject private var viewModel = MoodViewModel()
     @State private var chatInput: String = ""
     @State var navigateToChat: Bool = false
@@ -133,8 +133,8 @@ struct View: View {
                                         // Display animated dots when loading
                                         if isLoading {
                                             HStack {
-                                                Text(String(repeating: ".", count: dotCount % 4)) // Cycle through 0-3 dots
-                                                    .font(.system(size: 32, weight: .bold))
+                                                Text(String(repeating: ".", count: (dotCount % 3) + 1)) // Cycle through 0-3 dots
+                                                    .font(.system(size: 78, weight: .bold))
                                                     .foregroundColor(.gray)
                                                     .opacity(0.8)
                                                     .animation(.easeInOut(duration: 0.5), value: dotCount)
@@ -209,8 +209,9 @@ struct View: View {
                         .disabled(chatInput.isEmpty) // Disable the button when the input is empty
                     }
                     .frame(maxWidth: 340)
+
                 }
-                SideBarView(isShowing: $showSideBar)
+                SideBarView(isShowing: $showSideBar, selectedActivities: $selectedActivities)
             }
             .navigationBarItems(
                 leading: Button(action: {showSideBar.toggle()}) {

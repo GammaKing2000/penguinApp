@@ -103,7 +103,7 @@ struct MonthlyCalendarView: View {
                 leading: Button {
                     dismissCalendar()
                 } label: {
-                    Image(.chatIcon)
+                    Text("Back")
                 }
             )
             
