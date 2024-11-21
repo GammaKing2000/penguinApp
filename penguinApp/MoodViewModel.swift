@@ -17,7 +17,7 @@ class MoodViewModel: ObservableObject {
     }
 }
 
-struct MoodModelView: View {
+struct View: View {
     @StateObject private var viewModel = MoodViewModel()
     @State private var chatInput: String = ""
     @State var navigateToChat: Bool = false
@@ -25,7 +25,16 @@ struct MoodModelView: View {
     @State var messages: [ChatMessage] = []
     @State private var userInput: String = ""
     @State private var history: String = ""
+    
+    @State private var isLoading: Bool = false
+    @State private var dotCount: Int = 0
+
     @FocusState private var isInputFocused: Bool // New focus state
+    @State private var temp: String = ""
+    @Binding var selectedActivities: [String]
+    
+    let dotTimer = Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()
+
 
     let columns = [
         GridItem(.flexible()),
@@ -34,14 +43,16 @@ struct MoodModelView: View {
     ]
     
     func sendMessageToLLM() {
-        let prompt = chatInput
+        let prompt = temp
         let hist = history
-        NetworkManager.shared.sendChatRequest(prompt: prompt, history: hist) { response in
+        isLoading = true
+        NetworkManager.shared.sendChatRequest(prompt: prompt, history: hist, interestList: selectedActivities) { response in
             guard let response = response else { return }
+            chatInput = ""
             DispatchQueue.main.async {
+                isLoading = false
                 messages.append(ChatMessage(isUser: false, text: response.response))
                 history = response.history
-                chatInput = ""
             }
         }
     }
@@ -80,8 +91,10 @@ struct MoodModelView: View {
                                     }
                                     .onTapGesture {
                                         viewModel.selectMood(mood)
-                                        messages.append(ChatMessage(isUser: false, text: "Hi, Jess! Are you feeling " + mood.name.lowercased() + " today?"))
+//                                        messages.append(ChatMessage(isUser: false, text: "Hi, Jess! Are you feeling " + mood.name.lowercased() + " today?"))
                                         navigateToChat = true
+                                        temp = "the user is feeling " + mood.name.lowercased() + " today. Please ask the user why are they feeling " + mood.name.lowercased()
+                                        sendMessageToLLM()
                                     }
                                 }
                             }
@@ -114,17 +127,36 @@ struct MoodModelView: View {
                                                     Spacer()
                                                 }
                                             }
-                                            .id(message.id) // Add unique id for scrolling
+                                            .id(message.id)
+                                        }
+
+                                        // Display animated dots when loading
+                                        if isLoading {
+                                            HStack {
+                                                Text(String(repeating: ".", count: dotCount % 4)) // Cycle through 0-3 dots
+                                                    .font(.system(size: 32, weight: .bold))
+                                                    .foregroundColor(.gray)
+                                                    .opacity(0.8)
+                                                    .animation(.easeInOut(duration: 0.5), value: dotCount)
+                                                Spacer()
+                                            }
+                                            .id(UUID()) // Unique ID to ensure proper scrolling
                                         }
                                     }
                                     .padding()
                                 }
                                 .onChange(of: messages.count) { _ in
-                                    // Scroll to the last message when new message is added
                                     withAnimation {
-                                        proxy.scrollTo(messages.last?.id, anchor: .bottom)
+                                        if let lastMessageId = messages.last?.id {
+                                            proxy.scrollTo(lastMessageId, anchor: .bottom)
+                                        }
                                     }
                                 }
+                                .onReceive(dotTimer) { _ in
+                                    if isLoading {
+                                        dotCount += 1
+                                            }
+                                        }
                                 // Add gesture to dismiss or show keyboard
                                 .gesture(
                                     DragGesture()
@@ -198,14 +230,15 @@ struct MoodModelView: View {
     // Separate method to send message
 
     private func sendMessageToChat() {
+        temp = chatInput
         messages.append(ChatMessage(isUser: true, text: chatInput))
         navigateToChat = true
-        chatInput = "" // Clear input
+        chatInput.removeAll()
     }
 }
 
 struct MoodViewModel_Previews: PreviewProvider {
     static var previews: some View {
-        MoodModelView()
+        MoodModelView(selectedActivities: .constant([]))
     }
 }
