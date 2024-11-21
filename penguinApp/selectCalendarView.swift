@@ -44,7 +44,7 @@ struct ChooseCalendarView: View {
                         }
                     }.padding(50)
                     VStack (alignment: .center) {
-                        NavigationLink(destination: ChooseCalendarView().navigationBarBackButtonHidden(true)) {
+                        NavigationLink(destination: ChooseActivityView().navigationBarBackButtonHidden(true)) {
                             Text("Later")
                                 .fontWeight(.semibold)
                                 .foregroundColor(.gray)

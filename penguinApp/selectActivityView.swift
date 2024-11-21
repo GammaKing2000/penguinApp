@@ -84,7 +84,7 @@ struct ChooseActivityView: View {
                        }
                    }
                    // Add the spacing at the bottom to account for keyboard
-                   Spacer().frame(height: keyboardHeight)
+                   Spacer().frame(height: keyboardHeight - 180)
                }
            }
        }

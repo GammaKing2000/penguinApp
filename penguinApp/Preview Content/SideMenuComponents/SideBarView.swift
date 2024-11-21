@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SideBarView: View {
     @Binding var isShowing: Bool
+    @Binding var selectedActivities: [String]
     @State var selectedOption: SideBarOptionModel?
     @State var isNavigatingToMoodView: Bool = false
     var body: some View {
@@ -50,7 +51,7 @@ struct SideBarView: View {
         .animation(.smooth, value: isShowing)
         .background(
             NavigationLink(
-                destination: MoodModelView().navigationBarBackButtonHidden(true),
+                destination: MoodModelView(selectedActivities: $selectedActivities).navigationBarBackButtonHidden(true),
                 isActive: $isNavigatingToMoodView,
                 label: { EmptyView() }
             )
@@ -59,5 +60,5 @@ struct SideBarView: View {
 }
 
 #Preview {
-    SideBarView(isShowing: .constant(true))
+    SideBarView(isShowing: .constant(true), selectedActivities: .constant([]))
 }
