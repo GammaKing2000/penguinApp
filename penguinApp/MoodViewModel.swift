@@ -219,7 +219,7 @@ struct MoodModelView: View {
                         .imageScale(.large)
                         .foregroundStyle(Color("AppPurple"))
                 },
-                trailing: NavigationLink(destination: MonthlyCalendarView(navigateToChat: $navigateToChat).navigationBarBackButtonHidden(true)) {
+                trailing: NavigationLink(destination: MonthlyCalendarViewNew(navigateToChat: $navigateToChat).navigationBarBackButtonHidden(true)) {
                     Image(systemName: "calendar")
                         .imageScale(.large)
                         .foregroundStyle(Color("AppPurple"))
