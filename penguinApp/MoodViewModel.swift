@@ -3,11 +3,11 @@ import SwiftUI
 class MoodViewModel: ObservableObject {
     @Published var moods: [Mood] = [
         Mood(name: "Frustrated", imageName: "frustrated_penguin"),
-        Mood(name: "Thirsty", imageName: "thirsty_penguin"),
+        Mood(name: "Sad", imageName: "sad_penguin"),
         Mood(name: "Tired", imageName: "tired_penguin"),
-        Mood(name: "Sporty", imageName: "sporty_penguin"),
+        Mood(name: "Active", imageName: "sporty_penguin"),
         Mood(name: "Happy", imageName: "happy_penguin"),
-        Mood(name: "Weekend", imageName: "weekend_penguin")
+        Mood(name: "Bored", imageName: "weekend_penguin")
     ]
     
     @Published var selectedMood: Mood?
