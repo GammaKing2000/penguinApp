@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct SideBarHeaderView: View {
+    @AppStorage("name") private var name: String = "Name"
+    @AppStorage("email") private var email: String = "Email"
     var body: some View {
         HStack {
             Image(systemName: "person.circle.fill")
@@ -18,9 +20,9 @@ struct SideBarHeaderView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 10))
                 .padding(.vertical)
             VStack(alignment: .leading, spacing: 6){
-                Text("John Doe")
+                Text(name)
                     .fontWeight(.semibold)
-                Text("johndoe@example.com")
+                Text(email)
                     .font(.footnote)
                     .tint(.gray)
             }
