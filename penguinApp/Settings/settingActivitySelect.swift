@@ -1,17 +1,20 @@
 //
-//  selectActivityView.swift
+//  settingactivitySelect.swift
 //  penguinApp
 //
-//  Created by Nutnaree Duangdee on 19/11/2024.
+//  Created by River on 25/11/2024.
 //
 
 import SwiftUI
+import os
 
-struct ChooseActivityView: View {
-   func chooseActivity() {
+struct SettingActivitySelect: View {
+    @Environment(\.presentationMode) var presentationMode
+    
+    func chooseActivity() {
        activitiesList.insert(activity, at:0)
        selectedActivities.append(activity)
-       UserDefaults.standard.set(selectedActivities, forKey: "activities")
+        UserDefaults.standard.set(selectedActivities, forKey: "activities")
        activity = ""
    }
     func selectActivity(activity: String) {
@@ -22,7 +25,7 @@ struct ChooseActivityView: View {
         }
         UserDefaults.standard.set(selectedActivities, forKey: "activities")
     }
-   @State var selectedActivities: [String] = UserDefaults.standard.stringArray(forKey: "activities") ?? []
+    @State var selectedActivities: [String] = UserDefaults.standard.stringArray(forKey: "activities") ?? []
    @State var activity = ""
    @State var activitiesList = ["⚽️ Football", "🏀 Basketball", "🎳 Bowling", "🛶 Kayaking", "🥾 Hiking", "🧘‍♀️ Yoga", "🎮 Gaming", "📚 Reading", "☕️ Cafe Hopping"]
    @State private var keyboardHeight: CGFloat = 0
@@ -81,8 +84,21 @@ struct ChooseActivityView: View {
                                    }
                                    .multilineTextAlignment(.center)
                            }
-                           NavigationLink(destination: MoodModelView(selectedActivities: $selectedActivities).navigationBarBackButtonHidden(true)) {
-                               Text("Continue")
+                           /*
+                           NavigationLink(destination: SettingsPage().navigationBarBackButtonHidden(true)) {
+                               Text("Save")
+                                   .fontWeight(.semibold)
+                                   .foregroundColor(.white)
+                                   .frame(width: 280, height: 23)
+                                   .padding()
+                                   .background(Color("AppPurple"))
+                                   .cornerRadius(23)
+                           }
+                            */
+                           Button(action: {
+                               presentationMode.wrappedValue.dismiss();
+                           }) {
+                               Text("Save")
                                    .fontWeight(.semibold)
                                    .foregroundColor(.white)
                                    .frame(width: 280, height: 23)
@@ -107,5 +123,5 @@ struct ChooseActivityView: View {
 }
 
 #Preview {
-   ChooseActivityView()
+    SettingActivitySelect()
 }

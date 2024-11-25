@@ -27,7 +27,7 @@ struct WelcomeView: View {
                         .foregroundColor(.black)
                         .frame(width: 350, height: 10)
                         .padding(.top, 40)
-                    NavigationLink (destination: ChooseCalendarView().navigationBarBackButtonHidden(true)) {
+                    NavigationLink (destination: ChooseCalendarView(isFromeSetting: false).navigationBarBackButtonHidden(true)) {
                         Text("Let's start!")
                             .fontWeight(.semibold)
                             .foregroundColor(.white)

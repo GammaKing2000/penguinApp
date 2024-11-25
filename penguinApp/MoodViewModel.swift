@@ -18,6 +18,7 @@ class MoodViewModel: ObservableObject {
 }
 
 struct MoodModelView: View {
+    @AppStorage("name") private var name: String = "Name"
     @StateObject private var viewModel = MoodViewModel()
     @State private var chatInput: String = ""
     @State var navigateToChat: Bool = false
@@ -70,7 +71,7 @@ struct MoodModelView: View {
                 VStack {
                     if !navigateToChat {
                         VStack {
-                            Text("Hi, Jess! How are you feeling today?")
+                            Text("Hi, \(name)! How are you feeling today?")
                                 .font(.system(size: 32, weight: .bold))
                                 .multilineTextAlignment(.leading)
                                 .frame(width: 340)

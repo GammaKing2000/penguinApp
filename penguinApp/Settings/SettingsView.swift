@@ -8,7 +8,7 @@ struct SettingsPage: View {
         NavigationView {
             Form {
                 Section(header: Text("General")) {
-                    NavigationLink(destination: ChooseCalendarView()) {
+                    NavigationLink(destination: ChooseCalendarView(isFromeSetting: true)) {
                         Button(action: {}) {
                             HStack {
                                 Image(systemName: "calendar.badge.plus")
@@ -17,7 +17,7 @@ struct SettingsPage: View {
                         }
                     }
                     
-                    NavigationLink(destination: ChooseActivityView()) {
+                    NavigationLink(destination: SettingActivitySelect()) {
                         Button(action: {}) {
                             HStack {
                                 Image(systemName: "plus.circle")
