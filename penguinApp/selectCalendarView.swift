@@ -12,8 +12,15 @@ struct ChooseCalendarView: View {
         Calendar(id: "google", image: Image(.calendarGoogle), name: "Google Calendar"),
         Calendar(id: "outlook", image: Image(.calendarOutlook), name: "Outlook Calendar"),
     ]
+    var isFromSetting = true
     @State var selectedCalendarIndex = -1
     @State var isShowingConfirmation = false
+    @Environment(\.presentationMode) var presentationMode
+    
+    init(isFromeSetting: Bool) {
+        self.isFromSetting = isFromeSetting
+    }
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -44,21 +51,36 @@ struct ChooseCalendarView: View {
                         }
                     }.padding(50)
                     VStack (alignment: .center) {
-                        NavigationLink(destination: ChooseActivityView().navigationBarBackButtonHidden(true)) {
-                            Text("Later")
-                                .fontWeight(.semibold)
-                                .foregroundColor(.gray)
-                                .frame(width: 280, height: 40)
+                        if (isFromSetting) {
+                            Button(action: {
+                                presentationMode.wrappedValue.dismiss()
+                            }) {
+                                Text("Save")
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.white)
+                                    .frame(width: 280, height: 23)
+                                    .padding()
+                                    .background(Color("AppPurple"))
+                                    .cornerRadius(23)
                             }
-                        NavigationLink(destination: ChooseActivityView().navigationBarBackButtonHidden(true)) {
-                            Text("Continue")
-                                .fontWeight(.semibold)
-                                .foregroundColor(.white)
-                                .frame(width: 280, height: 23)
-                                .padding()
-                                .background(Color("AppPurple"))
-                                .cornerRadius(23)
+                        } else {
+                            NavigationLink(destination: SettingsPage().navigationBarBackButtonHidden(true)) {
+                                Text("Later")
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.gray)
+                                    .frame(width: 280, height: 40)
+                            }
+                            NavigationLink(destination: ChooseActivityView().navigationBarBackButtonHidden(true)) {
+                                Text("Continue")
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.white)
+                                    .frame(width: 280, height: 23)
+                                    .padding()
+                                    .background(Color("AppPurple"))
+                                    .cornerRadius(23)
+                            }
                         }
+                        
 
                     }
                 }
@@ -68,5 +90,5 @@ struct ChooseCalendarView: View {
 }
 
 #Preview {
-    ChooseCalendarView()
+    ChooseCalendarView(isFromeSetting: false)
 }
