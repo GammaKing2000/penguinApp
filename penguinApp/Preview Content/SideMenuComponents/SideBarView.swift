@@ -13,6 +13,7 @@ struct SideBarView: View {
     @State var selectedOption: SideBarOptionModel?
     @State var isNavigatingToMoodView: Bool = false
     @State var isProfileShowing: Bool = false
+    @State var isSettingsShowing: Bool = false
     var body: some View {
         ZStack {
             if isShowing {
@@ -30,7 +31,10 @@ struct SideBarView: View {
                                 Button(action: {
                                     selectedOption = option
                                     if option == .newchat {
-                                        isNavigatingToMoodView = true
+                                        isNavigatingToMoodView.toggle()
+                                    }
+                                    if option == .settings {
+                                        isSettingsShowing.toggle()
                                     }
                                     if option == .profile {
                                         isProfileShowing.toggle()
@@ -62,7 +66,9 @@ struct SideBarView: View {
                 isActive: $isNavigatingToMoodView,
                 label: { EmptyView() }
             )
-        )
+        ).sheet(isPresented: $isSettingsShowing){
+            SettingsPage()
+        }
     }
 }
 
